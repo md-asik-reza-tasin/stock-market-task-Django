@@ -1,8 +1,14 @@
 import { useState } from "react";
 import "./App.css";
 import { useEffect } from "react";
-import { MdAddCircleOutline } from "react-icons/md";
+import {
+  MdAddCircleOutline,
+  MdDeleteOutline,
+  MdModeEdit,
+} from "react-icons/md";
 import toast, { Toaster } from "react-hot-toast";
+import Swal from "sweetalert2";
+
 
 function App() {
   const [stockData, setStockData] = useState([]);
@@ -25,7 +31,7 @@ function App() {
   ];
 
   const stockInfo = stockData.filter((data) => data.trade_code === code);
-  // console.log(stockInfo);
+  console.log(stockInfo);
 
   const handleNewStockData = (e) => {
     e.preventDefault();
@@ -65,8 +71,38 @@ function App() {
           toast.success(data.message);
           setPostData(data);
           modal.close();
+          target.reset();
         }
       });
+  };
+
+  //Delete
+
+  const handleDelete = (id) => {
+    Swal.fire({
+      title: "Are you sure you to delete it?",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`http://127.0.0.1:5000/api/data/${id}`, {
+          method: "DELETE",
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.message) {
+              toast.success(data.message);
+              const filter = stockData.filter((data) => data.id !== id);
+              setStockData(filter);
+            }
+          })
+          .catch((error) => {
+            console.log(error.message);
+          });
+      }
+    });
   };
 
   return (
@@ -80,6 +116,9 @@ function App() {
           <option key={idx}>{trade}</option>
         ))}
       </select>
+      <div className="w-[1200px] border">
+        
+      </div>
       <div className="mt-10">
         <button
           className="flex justify-center items-center gap-1"
@@ -153,39 +192,55 @@ function App() {
           </div>
         </div>
       </dialog>
-      <div className="w-full h-full px-10 mt-5">
-        <div className="overflow-x-auto">
-          <table className="table table-lg">
-            <thead className="bg-black opacity-70 text-white">
-              <tr>
-                <th></th>
-                <th>Date</th>
-                <th>trade_code</th>
-                <th>high</th>
-                <th>low</th>
-                <th>open</th>
-                <th>close</th>
-                <th>volume</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {stockInfo?.map((codeInfo, idx) => (
-                <tr key={idx}>
-                  <td>{idx + 1}</td>
-                  <td>{codeInfo.date}</td>
-                  <td>{codeInfo.trade_code}</td>
-                  <td>{codeInfo.high}</td>
-                  <td>{codeInfo.low}</td>
-                  <td>{codeInfo.open}</td>
-                  <td>{codeInfo.close}</td>
-                  <td>{codeInfo.volume}</td>
+      {code && (
+        <div className="w-full h-full px-10 mt-5">
+          <div className="overflow-x-auto flex justify-center">
+            <table className="lg:w-[1200px] table-lg text-center">
+              <thead className="bg-black opacity-70 text-white">
+                <tr>
+                  <th></th>
+                  <th>Date</th>
+                  <th>trade_code</th>
+                  <th>high</th>
+                  <th>low</th>
+                  <th>open</th>
+                  <th>close</th>
+                  <th>volume</th>
+                  <th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {stockInfo?.map((codeInfo, idx) => (
+                  <tr key={idx}>
+                    <td>{idx + 1}</td>
+                    <td>{codeInfo.date}</td>
+                    <td>{codeInfo.trade_code}</td>
+                    <td>{codeInfo.high}</td>
+                    <td>{codeInfo.low}</td>
+                    <td>{codeInfo.open}</td>
+                    <td>{codeInfo.close}</td>
+                    <td>{codeInfo.volume}</td>
+                    <td className="flex justify-center items-center gap-5">
+                      <button
+                        onClick={() => handleDelete(codeInfo.id)}
+                        className="btn btn-sm btn-outline btn-error"
+                      >
+                        Delete
+                        <MdDeleteOutline className="text-red-600" />
+                      </button>
+                      <button className="btn btn-sm btn-outline btn-info">
+                        Edit
+                        <MdModeEdit className text-blue-600 />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

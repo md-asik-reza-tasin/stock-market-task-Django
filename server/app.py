@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_compress import Compress
 import sqlite3
@@ -65,6 +65,41 @@ def get_data():
         })
 
     return jsonify(data)
+
+
+# API route to insert data (NEW)
+@app.route('/api/data', methods=['POST'])
+def add_data():
+    # Parse JSON from request
+    stock_data = request.json
+
+    connect = sqlite3.connect('stock_data.db')
+    cursor = connect.cursor()
+
+    cursor.execute('''
+    INSERT INTO stock_data (date, trade_code, high, low, open, close, volume)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', (stock_data['date'], stock_data['tradeCode'], stock_data['high'],
+          stock_data['low'], stock_data['open'], stock_data['close'], stock_data['volume']))
+
+    connect.commit()
+    connect.close()
+
+    return jsonify({"message": "Stock data added successfully"}), 201
+
+
+
+@app.route('/api/data/<int:id>', methods=['DELETE'])
+def delete_data(id):
+    try:
+        connect = sqlite3.connect('stock_data.db')
+        cursor = connect.cursor()
+        cursor.execute("DELETE FROM stock_data WHERE id = ?", (id,))
+        connect.commit()
+        connect.close()
+        return jsonify({"message": "Data deleted successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     init_db()  # Initialize the database and create the table
