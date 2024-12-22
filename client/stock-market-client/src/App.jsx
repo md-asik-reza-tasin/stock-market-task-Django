@@ -72,7 +72,7 @@ function App() {
       .then((res) => res.json())
       .then((data) => {
         if (data.message && modal) {
-          toast.success(data.message);
+          toast.success(`${tradeCode} trade code added successfully`);
           setPostData(data);
           modal.close();
           target.reset();
@@ -171,7 +171,7 @@ function App() {
           <option key={idx}>{trade}</option>
         ))}
       </select>
-      <div className="w-[1200px]">
+      <div className="w-[900px]">
         <ChartOfStockData stockData={stockData}></ChartOfStockData>
       </div>
       <div className="mt-10">
@@ -193,7 +193,7 @@ function App() {
             className="grid grid-cols-2 gap-5"
           >
             <input
-              type="text"
+              type="date"
               placeholder="YYYY-MM-DD"
               className="input input-bordered input-md w-full"
               name="date"
@@ -211,6 +211,7 @@ function App() {
               placeholder="high"
               className="input input-bordered input-md w-full "
               name="high"
+              step="any"
               required
             />
             <input
@@ -218,6 +219,7 @@ function App() {
               placeholder="low"
               className="input input-bordered input-md w-full "
               name="low"
+              step="any"
               required
             />
             <input
@@ -225,6 +227,7 @@ function App() {
               placeholder="open"
               className="input input-bordered input-md w-full "
               name="open"
+              step="any"
               required
             />
             <input
@@ -232,6 +235,7 @@ function App() {
               placeholder="close"
               className="input input-bordered input-md w-full "
               name="close"
+              step="any"
               required
             />
             <input
@@ -239,6 +243,7 @@ function App() {
               placeholder="volume"
               className="input input-bordered input-md w-full col-span-2"
               name="volume"
+              step="any"
               required
             />
             <input
@@ -257,9 +262,9 @@ function App() {
       {code && (
         <div className="w-full h-full px-10 mt-5">
           <div className="overflow-x-auto flex justify-center">
-            <div className="overflow-x-auto w-full">
-              <table className="table-lg text-center w-full min-w-max">
-                <thead className="bg-black opacity-70 text-white">
+            <div className="overflow-x-auto max-h-[680px] w-[1200px]">
+              <table className="table-sm lg:table-lg text-center w-full min-w-max">
+                <thead className="bg-black opacity-70 text-white sticky top-0 z-10">
                   <tr>
                     <th></th>
                     <th>Date</th>
@@ -283,7 +288,7 @@ function App() {
                       <td>{codeInfo.low}</td>
                       <td>{codeInfo.open}</td>
                       <td>{codeInfo.close}</td>
-                      <td>{codeInfo.volume}</td>
+                      <td>{codeInfo.volume.toLocaleString()}</td>
                       <td className="flex justify-center items-center gap-5">
                         <button
                           onClick={() => handleDelete(codeInfo.id)}
@@ -318,7 +323,7 @@ function App() {
                     className="grid grid-cols-2 gap-5"
                   >
                     <input
-                      type="text"
+                      type="date"
                       placeholder="YYYY-MM-DD"
                       className="input input-bordered input-md w-full"
                       name="date"
@@ -364,11 +369,14 @@ function App() {
                       defaultValue={currentRow.close}
                     />
                     <input
-                      type="text"
+                      type="number"
                       placeholder="volume"
                       className="input input-bordered input-md w-full col-span-2"
                       name="volume"
-                      defaultValue={currentRow.volume}
+                      defaultValue={parseInt(
+                        String(currentRow.volume).replace(/,/g, ""),
+                        10
+                      )}
                     />
                     <input
                       type="submit"
