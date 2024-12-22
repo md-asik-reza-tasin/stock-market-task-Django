@@ -8,15 +8,24 @@ import {
 } from "react-icons/md";
 import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
-
+import ChartOfStockData from "./ChartOfStockData";
 
 function App() {
   const [stockData, setStockData] = useState([]);
   const [code, setCode] = useState("SELECT TRADE CODE");
   const [postData, setPostData] = useState(null);
+  const [allTradeCode, setAllTradeCode] = useState([]);
+  const [currentData, setcurrentData] = useState([]);
+  const [update, setUpdate] = useState(null);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/api/data")
+    fetch("http://127.0.0.1:5000/api/trade_codes")
+      .then((res) => res.json())
+      .then((data) => setAllTradeCode(data.trade_codes));
+  }, [postData]);
+
+  useEffect(() => {
+    fetch(`http://127.0.0.1:5000/api/data?trade_code=${code}`)
       .then((res) => res.json())
       .then((data) => {
         setStockData(data);
@@ -24,14 +33,9 @@ function App() {
       .catch((error) => {
         console.log(error);
       });
-  }, [postData]);
+  }, [postData, code, update]);
 
-  const tradeCode = [
-    ...new Set(stockData.map((singleData) => singleData.trade_code)),
-  ];
-
-  const stockInfo = stockData.filter((data) => data.trade_code === code);
-  console.log(stockInfo);
+  //Handle New Stock Data
 
   const handleNewStockData = (e) => {
     e.preventDefault();
@@ -76,8 +80,7 @@ function App() {
       });
   };
 
-  //Delete
-
+  //Handle Delete
   const handleDelete = (id) => {
     Swal.fire({
       title: "Are you sure you to delete it?",
@@ -105,6 +108,58 @@ function App() {
     });
   };
 
+  //HANDLE EDIT
+
+  const handleEdit = (id) => {
+    const editData = stockData.filter((single) => single.id === id);
+    setcurrentData(editData);
+  };
+
+  //HANDLE currentData
+
+  const handlecurrentData = (e, id) => {
+    e.preventDefault();
+
+    const target = e.target;
+    const modal = document.getElementById("my_modal_5");
+
+    const date = target.date.value;
+    const tradeCode = target.tradecode.value;
+    const high = target.high.value;
+    const low = target.low.value;
+    const open = target.open.value;
+    const close = target.close.value;
+    const volume = target.volume.value;
+
+    const newStock = {
+      date,
+      tradeCode,
+      high,
+      low,
+      low,
+      open,
+      close,
+      volume,
+    };
+
+    fetch(`http://127.0.0.1:5000/api/data/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newStock),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.message && modal) {
+          toast.success(data.message);
+          setUpdate(data);
+          modal.close();
+          target.reset();
+        }
+      });
+  };
+
   return (
     <div className="w-screen h-screen flex flex-col items-center">
       <select
@@ -112,12 +167,12 @@ function App() {
         onChange={(e) => setCode(e.target.value)}
       >
         <option selected>SELECT TRADE CODE</option>
-        {tradeCode.map((trade, idx) => (
+        {allTradeCode.map((trade, idx) => (
           <option key={idx}>{trade}</option>
         ))}
       </select>
-      <div className="w-[1200px] border">
-        
+      <div className="w-[1200px]">
+        <ChartOfStockData stockData={stockData}></ChartOfStockData>
       </div>
       <div className="mt-10">
         <button
@@ -142,42 +197,49 @@ function App() {
               placeholder="YYYY-MM-DD"
               className="input input-bordered input-md w-full"
               name="date"
+              required
             />
             <input
               type="text"
               placeholder="trade_code"
               className="input input-bordered input-md w-full "
               name="tradecode"
+              required
             />
             <input
               type="number"
               placeholder="high"
               className="input input-bordered input-md w-full "
               name="high"
+              required
             />
             <input
               type="number"
               placeholder="low"
               className="input input-bordered input-md w-full "
               name="low"
+              required
             />
             <input
               type="number"
               placeholder="open"
               className="input input-bordered input-md w-full "
               name="open"
+              required
             />
             <input
               type="number"
               placeholder="close"
               className="input input-bordered input-md w-full "
               name="close"
+              required
             />
             <input
               type="number"
               placeholder="volume"
               className="input input-bordered input-md w-full col-span-2"
               name="volume"
+              required
             />
             <input
               type="submit"
@@ -195,49 +257,133 @@ function App() {
       {code && (
         <div className="w-full h-full px-10 mt-5">
           <div className="overflow-x-auto flex justify-center">
-            <table className="lg:w-[1200px] table-lg text-center">
-              <thead className="bg-black opacity-70 text-white">
-                <tr>
-                  <th></th>
-                  <th>Date</th>
-                  <th>trade_code</th>
-                  <th>high</th>
-                  <th>low</th>
-                  <th>open</th>
-                  <th>close</th>
-                  <th>volume</th>
-                  <th></th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {stockInfo?.map((codeInfo, idx) => (
-                  <tr key={idx}>
-                    <td>{idx + 1}</td>
-                    <td>{codeInfo.date}</td>
-                    <td>{codeInfo.trade_code}</td>
-                    <td>{codeInfo.high}</td>
-                    <td>{codeInfo.low}</td>
-                    <td>{codeInfo.open}</td>
-                    <td>{codeInfo.close}</td>
-                    <td>{codeInfo.volume}</td>
-                    <td className="flex justify-center items-center gap-5">
-                      <button
-                        onClick={() => handleDelete(codeInfo.id)}
-                        className="btn btn-sm btn-outline btn-error"
-                      >
-                        Delete
-                        <MdDeleteOutline className="text-red-600" />
-                      </button>
-                      <button className="btn btn-sm btn-outline btn-info">
-                        Edit
-                        <MdModeEdit className text-blue-600 />
-                      </button>
-                    </td>
+            <div className="overflow-x-auto w-full">
+              <table className="table-lg text-center w-full min-w-max">
+                <thead className="bg-black opacity-70 text-white">
+                  <tr>
+                    <th></th>
+                    <th>Date</th>
+                    <th>trade_code</th>
+                    <th>high</th>
+                    <th>low</th>
+                    <th>open</th>
+                    <th>close</th>
+                    <th>volume</th>
+                    <th></th>
                   </tr>
+                </thead>
+
+                <tbody>
+                  {stockData?.map((codeInfo, idx) => (
+                    <tr key={idx} className="border-b">
+                      <td>{idx + 1}</td>
+                      <td>{codeInfo.date}</td>
+                      <td>{codeInfo.trade_code}</td>
+                      <td>{codeInfo.high}</td>
+                      <td>{codeInfo.low}</td>
+                      <td>{codeInfo.open}</td>
+                      <td>{codeInfo.close}</td>
+                      <td>{codeInfo.volume}</td>
+                      <td className="flex justify-center items-center gap-5">
+                        <button
+                          onClick={() => handleDelete(codeInfo.id)}
+                          className="btn btn-sm btn-outline btn-error"
+                        >
+                          Delete
+                          <MdDeleteOutline className="text-red-600" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            document.getElementById("my_modal_5").showModal();
+                            handleEdit(codeInfo.id);
+                          }}
+                          className="btn btn-sm btn-outline btn-info"
+                        >
+                          Edit
+                          <MdModeEdit className="text-sky-400" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <dialog id="my_modal_5" className="modal">
+              <div className="modal-box  max-w-5xl p-20">
+                {currentData.map((currentRow, idx) => (
+                  <form
+                    key={idx}
+                    onSubmit={(e) => handlecurrentData(e, currentRow.id)}
+                    className="grid grid-cols-2 gap-5"
+                  >
+                    <input
+                      type="text"
+                      placeholder="YYYY-MM-DD"
+                      className="input input-bordered input-md w-full"
+                      name="date"
+                      defaultValue={currentRow.date}
+                    />
+                    <input
+                      type="text"
+                      placeholder="trade_code"
+                      className="input input-bordered input-md w-full "
+                      name="tradecode"
+                      defaultValue={currentRow.trade_code}
+                    />
+                    <input
+                      type="number"
+                      placeholder="high"
+                      className="input input-bordered input-md w-full "
+                      name="high"
+                      step="any"
+                      defaultValue={currentRow.high}
+                    />
+                    <input
+                      type="number"
+                      placeholder="low"
+                      className="input input-bordered input-md w-full "
+                      name="low"
+                      step="any"
+                      defaultValue={currentRow.low}
+                    />
+                    <input
+                      type="number"
+                      placeholder="open"
+                      className="input input-bordered input-md w-full "
+                      name="open"
+                      step="any"
+                      defaultValue={currentRow.open}
+                    />
+                    <input
+                      type="number"
+                      placeholder="close"
+                      className="input input-bordered input-md w-full "
+                      name="close"
+                      step="any"
+                      defaultValue={currentRow.close}
+                    />
+                    <input
+                      type="text"
+                      placeholder="volume"
+                      className="input input-bordered input-md w-full col-span-2"
+                      name="volume"
+                      defaultValue={currentRow.volume}
+                    />
+                    <input
+                      type="submit"
+                      value="Update"
+                      className="bg-black opacity-80 w-full col-span-2 text-white h-12 rounded-md"
+                    />
+                  </form>
                 ))}
-              </tbody>
-            </table>
+                <div className="modal-action">
+                  <form method="dialog">
+                    <button className="btn">Close</button>
+                  </form>
+                </div>
+              </div>
+            </dialog>
           </div>
         </div>
       )}
