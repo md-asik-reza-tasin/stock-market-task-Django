@@ -29,12 +29,11 @@ ChartJS.register(
 );
 
 export default function ChartOfStockData({ stockData }) {
-  // Filter stockData for unique dates
   const uniqueStockData = stockData.filter(
     (item, index, self) => index === self.findIndex((t) => t.date === item.date)
   );
 
-  //   console.log(stockData);
+  uniqueStockData.sort((a, b) => new Date(a.date) - new Date(b.date));
 
   const chartData = {
     labels: uniqueStockData.map((item) => item.date),
@@ -62,6 +61,7 @@ export default function ChartOfStockData({ stockData }) {
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     scales: {
       y1: {
         type: "linear",
@@ -80,7 +80,10 @@ export default function ChartOfStockData({ stockData }) {
   };
 
   return (
-    <div className="mt-10">
+    <div
+      className="mt-10"
+      style={{ position: "relative", height: "400px", width: "100%" }}
+    >
       <Bar data={chartData} options={chartOptions}></Bar>
     </div>
   );

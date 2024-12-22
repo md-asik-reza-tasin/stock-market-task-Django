@@ -7,13 +7,13 @@ import time
 
 app = Flask(__name__)
 
-# Enable CORS and compression for the app
+
 CORS(app)
 Compress(app)
 
 DATABASE = 'stock_data.db'
 
-# Get database connection
+
 def get_db():
     if 'db' not in g:
         g.db = sqlite3.connect(DATABASE)
@@ -25,7 +25,7 @@ def close_db(exception):
     if db is not None:
         db.close()
 
-# Initialize the database and create the table if it doesn't exist
+
 def init_db():
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
@@ -43,7 +43,7 @@ def init_db():
         ''')
         conn.commit()
 
-# Insert data from JSON into SQLite database (only if table is empty)
+# INSERT OUR JSON DATA
 def insert_data():
     with open('data.json', 'r') as file:
         data = json.load(file)
@@ -75,15 +75,15 @@ def log_response(response):
 @app.route('/api/trade_codes', methods=['GET'])
 def get_trade_codes():
     try:
-        # Connect to the database
+        
         conn = sqlite3.connect('stock_data.db')
         cursor = conn.cursor()
 
-        # Fetch unique trade codes
+       
         cursor.execute("SELECT DISTINCT trade_code FROM stock_data")
         rows = cursor.fetchall()
 
-        # Convert to a list
+        
         trade_codes = [row[0] for row in rows]
 
         return jsonify({"trade_codes": trade_codes}), 200
@@ -95,30 +95,31 @@ def get_trade_codes():
 
 
 
-# Endpoint to fetch **all data**
+#TRADE CODE DATA
+
 @app.route('/api/data', methods=['GET'])
 def get_stock_data():
     try:
-        # Get the 'trade_code' parameter from the query string
+        
         trade_code = request.args.get('trade_code')
 
         conn = get_db()
         cursor = conn.cursor()
 
         if trade_code:
-            # If 'trade_code' is provided, fetch specific data
+            
             query = "SELECT * FROM stock_data WHERE trade_code = ?"
             cursor.execute(query, (trade_code,))
         else:
-            # If no 'trade_code' is provided, fetch all data
+            
             query = "SELECT DISTINCT trade_code FROM stock_data"
             cursor.execute(query)
 
         rows = cursor.fetchall()
 
-        # Convert rows to list of dictionaries
+        
         if trade_code:
-            # For specific trade code, return detailed stock data
+            
             data = [
                 {
                     "id": row[0],
@@ -133,7 +134,7 @@ def get_stock_data():
                 for row in rows
             ]
         else:
-            # For no trade code, return only available trade codes
+            
             data = [{"trade_code": row[0]} for row in rows]
 
         return jsonify(data), 200
@@ -141,7 +142,7 @@ def get_stock_data():
         return jsonify({"error": str(e)}), 500
 
 
-# API route to insert new data
+# ADD NEW DATA
 @app.route('/api/data', methods=['POST'])
 def add_data():
     try:
@@ -158,7 +159,7 @@ def add_data():
     except sqlite3.Error as e:
         return jsonify({"error": str(e)}), 500
 
-# API route to delete data by ID
+# DELETE
 @app.route('/api/data/<int:id>', methods=['DELETE'])
 def delete_data(id):
     try:

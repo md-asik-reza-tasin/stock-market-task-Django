@@ -18,11 +18,15 @@ function App() {
   const [currentData, setcurrentData] = useState([]);
   const [update, setUpdate] = useState(null);
 
+  //FETCH ALL THE TRADE CODE
+
   useEffect(() => {
     fetch("http://127.0.0.1:5000/api/trade_codes")
       .then((res) => res.json())
       .then((data) => setAllTradeCode(data.trade_codes));
   }, [postData]);
+
+  //FETCH STOCK DATA ACCORDING TO TRADE CODE
 
   useEffect(() => {
     fetch(`http://127.0.0.1:5000/api/data?trade_code=${code}`)
@@ -35,7 +39,7 @@ function App() {
       });
   }, [postData, code, update]);
 
-  //Handle New Stock Data
+  //ADD NEW STOCK
 
   const handleNewStockData = (e) => {
     e.preventDefault();
@@ -80,7 +84,8 @@ function App() {
       });
   };
 
-  //Handle Delete
+  //DELETE SPECIFIC STOCK DATA
+
   const handleDelete = (id) => {
     Swal.fire({
       title: "Are you sure you to delete it?",
@@ -108,14 +113,14 @@ function App() {
     });
   };
 
-  //HANDLE EDIT
+  //FOR SHOWING THE MODAL (SPECIFIC STOCK DATA ACCORDING TO ID)
 
   const handleEdit = (id) => {
     const editData = stockData.filter((single) => single.id === id);
     setcurrentData(editData);
   };
 
-  //HANDLE currentData
+  //UPDATE STOCK DATA
 
   const handlecurrentData = (e, id) => {
     e.preventDefault();
@@ -160,8 +165,27 @@ function App() {
       });
   };
 
+  //FIND OUT THE CLOSE AVG
+
+  const closeAvg = stockData
+    .reduce((total, stock) => total + stock.close / stockData.length, 0)
+    .toFixed(2);
+
+  //FIND OUT THE VOLUME AVG
+
+  const volumeAvg = stockData
+    .reduce(
+      (total, stock) =>
+        total +
+        parseInt(stock.volume.toString().replace(/,/g, "")) / stockData.length,
+      0
+    )
+    .toFixed(2);
+
   return (
     <div className="w-screen h-screen flex flex-col items-center">
+      {/* WE CAN CHOOSE TRADE CODE HERE */}
+
       <select
         className="select select-bordered mt-10"
         onChange={(e) => setCode(e.target.value)}
@@ -171,9 +195,48 @@ function App() {
           <option key={idx}>{trade}</option>
         ))}
       </select>
-      <div className="w-[900px]">
-        <ChartOfStockData stockData={stockData}></ChartOfStockData>
+
+      {/* SHOWING THE CHART */}
+
+      <div className="grid grid-cols-1 md:grid-cols-4 w-full md:w-[1200px] md:border p-10 mt-10 gap-10">
+        {/* CHART */}
+
+        <div className="col-span-1 md:col-span-3">
+          <ChartOfStockData stockData={stockData}></ChartOfStockData>
+        </div>
+
+        {/* TRADE CODE , CLOSE AVG, VOLUME AVG */}
+
+        <div className="grid grid-cols-1 mt-12 gap-5">
+          <div className="md:w-56 h-32 bg-red-100 shadow-xl">
+            <h1 className="font-bold text-gray-400 text-sm ml-6 mt-5">
+              Trade Code
+            </h1>
+            <p className="font-extrabold text-2xl ml-6 mt-3">
+              {code === "SELECT TRADE CODE" ? "----" : code}
+            </p>
+          </div>
+          <div className="md:w-56 h-32 bg-orange-100 shadow-xl">
+            <h1 className="font-bold text-gray-400 text-sm ml-6 mt-5">
+              Close Average
+            </h1>
+            <p className="font-extrabold text-2xl ml-6 mt-3">
+              {code === "SELECT TRADE CODE" ? "----" : closeAvg}
+            </p>
+          </div>
+          <div className="md:w-56 h-32 bg-yellow-100 shadow-xl">
+            <h1 className="font-bold text-gray-400 text-sm ml-6 mt-5">
+              Volume Average
+            </h1>
+            <p className="font-extrabold text-2xl ml-6 mt-3">
+              {code === "SELECT TRADE CODE" ? "----" : volumeAvg}
+            </p>
+          </div>
+        </div>
       </div>
+
+      {/* HERE WE CAN ADD NEW STOCK */}
+
       <div className="mt-10">
         <button
           className="flex justify-center items-center gap-1"
@@ -183,9 +246,15 @@ function App() {
           <p className="text-sm">ADD STOCK</p>
         </button>
       </div>
+
+      {/* TOAST */}
+
       <div>
         <Toaster />
       </div>
+
+      {/* MODAL FOR SHOWING THE FORM */}
+
       <dialog id="my_modal_4" className="modal">
         <div className="modal-box p-16 w-11/12 max-w-5xl rounded-sm">
           <form
@@ -259,6 +328,9 @@ function App() {
           </div>
         </div>
       </dialog>
+
+      {/* HERE WE CAN SEE THE TABLE OF STOCK DATA */}
+
       {code && (
         <div className="w-full h-full px-10 mt-5">
           <div className="overflow-x-auto flex justify-center">
@@ -289,6 +361,8 @@ function App() {
                       <td>{codeInfo.open}</td>
                       <td>{codeInfo.close}</td>
                       <td>{codeInfo.volume.toLocaleString()}</td>
+
+                      {/* WE CAN DELETE SPECIFIC DATA */}
                       <td className="flex justify-center items-center gap-5">
                         <button
                           onClick={() => handleDelete(codeInfo.id)}
@@ -297,6 +371,9 @@ function App() {
                           Delete
                           <MdDeleteOutline className="text-red-600" />
                         </button>
+
+                        {/* EDIT BUTTON, FOR UPDATE DATA */}
+
                         <button
                           onClick={() => {
                             document.getElementById("my_modal_5").showModal();
@@ -313,6 +390,8 @@ function App() {
                 </tbody>
               </table>
             </div>
+
+            {/* MODAL FOR SHOWING FORM, WE CAN UPDATE OUR STOCK DATA */}
 
             <dialog id="my_modal_5" className="modal">
               <div className="modal-box  max-w-5xl p-20">
