@@ -201,7 +201,7 @@ function App() {
       <div className="grid grid-cols-1 md:grid-cols-4 w-full md:w-[1200px] md:border p-10 mt-10 gap-10">
         {/* CHART */}
 
-        <div className="col-span-1 md:col-span-3">
+        <div className="md:col-span-3">
           <ChartOfStockData stockData={stockData}></ChartOfStockData>
         </div>
 
