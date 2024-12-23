@@ -84,7 +84,7 @@ function App() {
       .then((res) => res.json())
       .then((data) => {
         if (data.message && modal) {
-          toast.success(`${tradeCode} trade code added successfully`);
+          toast.success(`Added successfully`);
           setPostData(data);
           modal.close();
           target.reset();
@@ -275,14 +275,14 @@ function App() {
 
       <div className="md:flex justify-between items-center mt-16 w-full md:max-w-[1200px]">
         <button
-          className="flex justify-center items-center gap-1 mt-0 md:mt-16 mx-auto md:mx-0"
+          className="btn flex justify-center items-center gap-1 mt-0 md:mt-16 mx-auto md:mx-0"
           onClick={() => document.getElementById("my_modal_4").showModal()}
         >
           <MdAddCircleOutline className="size-4" />{" "}
           <p className="text-sm">ADD STOCK</p>
         </button>
 
-        <label className="form-control w-full max-w-xs mr-1 mt-4 ml-24 md:ml-0">
+        <label className="form-control w-full max-w-xs mr-1 mt-4 ml-24 md:ml-0 pt-6">
           <div className="label">
             <span className="label-text">Search by date</span>
           </div>
@@ -343,19 +343,23 @@ function App() {
                 onChange={(e) => setExist(e.currentTarget.value)}
                 required
               />
-              <details className="dropdown dropdown-end absolute right-3 top-2">
-                <summary className="m-1"></summary>
-                <ul className="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
-                  <li>
-                    <p
-                      onClick={() => setExist(existCode.current.innerHTML)}
-                      ref={existCode}
-                    >
-                      {stockData?.[0]?.["trade_code"]}
-                    </p>
-                  </li>
-                </ul>
-              </details>
+              {exist.length === 0 && (
+                <details className="dropdown dropdown-end absolute right-3 top-2">
+                  <summary className="m-1"></summary>
+                  <ul className="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                    <li>
+                      <p
+                        onClick={() => {
+                          setExist(existCode?.current?.innerHTML);
+                        }}
+                        ref={existCode}
+                      >
+                        {stockData?.[0]?.["trade_code"]}
+                      </p>
+                    </li>
+                  </ul>
+                </details>
+              )}
             </div>
 
             <input
@@ -497,6 +501,7 @@ function App() {
                       className="input input-bordered input-md w-full "
                       name="tradecode"
                       defaultValue={currentRow.trade_code}
+                      disabled
                     />
                     <input
                       type="number"
