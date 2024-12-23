@@ -9,7 +9,6 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
 import ChartOfStockData from "./ChartOfStockData";
-import { IoIosArrowDown } from "react-icons/io";
 
 function App() {
   const [stockData, setStockData] = useState([]);
@@ -20,6 +19,7 @@ function App() {
   const [update, setUpdate] = useState(null);
   const [date, setDate] = useState("");
   const [exist, setExist] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const location = useRef();
   const existCode = useRef();
@@ -133,6 +133,8 @@ function App() {
   const handlecurrentData = (e, id) => {
     e.preventDefault();
 
+    setErrorMessage("");
+
     const target = e.target;
     const modal = document.getElementById("my_modal_5");
 
@@ -144,33 +146,46 @@ function App() {
     const close = target.close.value;
     const volume = target.volume.value;
 
-    const newStock = {
-      date,
-      tradeCode,
-      high,
-      low,
-      low,
-      open,
-      close,
-      volume,
-    };
+    if (volume.toString().length >= 8) {
+      return setErrorMessage("Volume is too big, It should not exceed 8 digit");
+    } else if (high.toString().length > 6) {
+      return setErrorMessage("high is too big, It should not exceed 6 digit");
+    } else if (low.toString().length > 6) {
+      return setErrorMessage("low is too big, It should not exceed 6 digit");
+    } else if (close.toString().length >= 8) {
+      return setErrorMessage("close is too big, It should not exceed 8 digit");
+    } else if (open.toString().length > 6) {
+      return setErrorMessage("open is too big, It should not exceed 6 digit");
+    } else {
+      
+      const newStock = {
+        date,
+        tradeCode,
+        high,
+        low,
+        low,
+        open,
+        close,
+        volume,
+      };
 
-    fetch(`http://127.0.0.1:5000/api/data/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newStock),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.message && modal) {
-          toast.success(data.message);
-          setUpdate(data);
-          modal.close();
-          target.reset();
-        }
-      });
+      fetch(`http://127.0.0.1:5000/api/data/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newStock),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.message && modal) {
+            toast.success(data.message);
+            setUpdate(data);
+            modal.close();
+            target.reset();
+          }
+        });
+    }
   };
 
   //FIND OUT THE CLOSE AVG
@@ -207,7 +222,7 @@ function App() {
             0
           ) / stockData.length
         )
-      : 0.00;
+      : 0;
 
   //SEARCH
 
@@ -354,7 +369,7 @@ function App() {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Create new or select existing trade code"
+                placeholder="Create new                Or"
                 className="input input-bordered input-md w-full "
                 name="tradecode"
                 value={exist}
@@ -363,7 +378,7 @@ function App() {
               />
               {exist.length === 0 && (
                 <details className="dropdown dropdown-end absolute right-3 top-2">
-                  <summary className="m-1"></summary>
+                  <summary className="m-1">select existing trade code</summary>
                   <ul className="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
                     <li>
                       <p
@@ -506,68 +521,95 @@ function App() {
                     onSubmit={(e) => handlecurrentData(e, currentRow.id)}
                     className="grid grid-cols-2 gap-5"
                   >
-                    <input
-                      type="date"
-                      placeholder="YYYY-MM-DD"
-                      className="input input-bordered input-md w-full"
-                      name="date"
-                      defaultValue={currentRow.date}
-                    />
-                    <input
-                      type="text"
-                      placeholder="trade_code"
-                      className="input input-bordered input-md w-full "
-                      name="tradecode"
-                      defaultValue={currentRow.trade_code}
-                      disabled
-                    />
-                    <input
-                      type="number"
-                      placeholder="high"
-                      className="input input-bordered input-md w-full "
-                      name="high"
-                      step="any"
-                      defaultValue={currentRow.high}
-                    />
-                    <input
-                      type="number"
-                      placeholder="low"
-                      className="input input-bordered input-md w-full "
-                      name="low"
-                      step="any"
-                      defaultValue={currentRow.low}
-                    />
-                    <input
-                      type="number"
-                      placeholder="open"
-                      className="input input-bordered input-md w-full "
-                      name="open"
-                      step="any"
-                      defaultValue={currentRow.open}
-                    />
-                    <input
-                      type="number"
-                      placeholder="close"
-                      className="input input-bordered input-md w-full "
-                      name="close"
-                      step="any"
-                      defaultValue={currentRow.close}
-                    />
-                    <input
-                      type="number"
-                      placeholder="volume"
-                      className="input input-bordered input-md w-full col-span-2"
-                      name="volume"
-                      defaultValue={parseInt(
-                        String(currentRow.volume).replace(/,/g, ""),
-                        10
-                      )}
-                    />
+                    <label>
+                      <span className="mb-1">Date</span>
+                      <input
+                        type="date"
+                        placeholder="YYYY-MM-DD"
+                        className="input input-bordered input-md w-full"
+                        name="date"
+                        defaultValue={currentRow.date}
+                      />
+                    </label>
+                    <label>
+                      <span className="mb-2 ml-1">Trade Code</span>
+                      <input
+                        type="text"
+                        placeholder="trade_code"
+                        className="input input-bordered input-md w-full "
+                        name="tradecode"
+                        defaultValue={currentRow.trade_code}
+                        disabled
+                      />
+                    </label>
+                    <label>
+                      <span className="mb-2 ml-1">High</span>
+                      <input
+                        type="number"
+                        placeholder="high"
+                        className="input input-bordered input-md w-full "
+                        name="high"
+                        step="any"
+                        defaultValue={currentRow.high}
+                      />
+                    </label>
+                    <label>
+                      <span className="mb-2 ml-1">Low</span>
+                      <input
+                        type="number"
+                        placeholder="low"
+                        className="input input-bordered input-md w-full "
+                        name="low"
+                        step="any"
+                        defaultValue={currentRow.low}
+                      />
+                    </label>
+                    <label>
+                      <span className="mb-2 ml-1">Open</span>
+                      <input
+                        type="number"
+                        placeholder="open"
+                        className="input input-bordered input-md w-full "
+                        name="open"
+                        step="any"
+                        defaultValue={currentRow.open}
+                      />
+                    </label>
+                    <label>
+                      <span className="mb-2 ml-1">Close</span>
+                      <input
+                        type="number"
+                        placeholder="close"
+                        className="input input-bordered input-md w-full "
+                        name="close"
+                        step="any"
+                        defaultValue={currentRow.close}
+                      />
+                    </label>
+                    <label>
+                      <span className="mb-2 ml-1">Volume</span>
+                      <input
+                        type="number"
+                        placeholder="volume"
+                        className="input input-bordered input-md w-full col-span-2"
+                        name="volume"
+                        defaultValue={parseInt(
+                          String(currentRow.volume).replace(/,/g, ""),
+                          10
+                        )}
+                      />
+                    </label>
+
+                    {/* UPDATE MODAL BUTTON */}
+
                     <input
                       type="submit"
                       value="Update"
                       className="bg-black opacity-80 w-full col-span-2 text-white h-12 rounded-md"
                     />
+                    <p className="text-red-600 text-center col-span-2">
+                      {errorMessage.length > 0 && errorMessage}
+                    </p>
                   </form>
                 ))}
                 <div className="modal-action">
