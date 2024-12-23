@@ -42,7 +42,9 @@ function App() {
   //FETCH STOCK DATA ACCORDING TO TRADE CODE
 
   useEffect(() => {
-    fetch(`https://stock-market-1-29wp.onrender.com/api/data?trade_code=${code}`)
+    fetch(
+      `https://stock-market-1-29wp.onrender.com/api/data?trade_code=${code}`
+    )
       .then((res) => res.json())
       .then((data) => {
         setStockData(data);
@@ -372,7 +374,7 @@ function App() {
         <div className="modal-box p-16 w-11/12 max-w-5xl rounded-sm">
           <form
             onSubmit={handleNewStockData}
-            className="grid grid-cols-2 gap-5"
+            className="flex flex-col  md:grid  md:grid-cols-2 gap-5"
           >
             <input
               type="date"
@@ -538,7 +540,7 @@ function App() {
                   <form
                     key={idx}
                     onSubmit={(e) => handlecurrentData(e, currentRow.id)}
-                    className="grid grid-cols-2 gap-5"
+                    className="flex flex-col md:grid md:grid-cols-2 gap-5"
                   >
                     <label>
                       <span className="mb-1">Date</span>
