@@ -385,7 +385,7 @@ function App() {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Create new                Or"
+                placeholder="Create new or select"
                 className="input input-bordered input-md w-full "
                 name="tradecode"
                 value={exist}
@@ -394,7 +394,7 @@ function App() {
               />
               {exist.length === 0 && (
                 <details className="dropdown dropdown-end absolute right-3 top-2">
-                  <summary className="m-1">select existing trade code</summary>
+                  <summary className="m-1"></summary>
                   <ul className="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
                     <li>
                       <p
