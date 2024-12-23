@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import "./App.css";
 import { useEffect } from "react";
 import {
@@ -9,6 +9,7 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
 import ChartOfStockData from "./ChartOfStockData";
+import { IoIosArrowDown } from "react-icons/io";
 
 function App() {
   const [stockData, setStockData] = useState([]);
@@ -17,6 +18,13 @@ function App() {
   const [allTradeCode, setAllTradeCode] = useState([]);
   const [currentData, setcurrentData] = useState([]);
   const [update, setUpdate] = useState(null);
+  const [date, setDate] = useState("");
+  const [exist, setExist] = useState("");
+
+  const location = useRef();
+  const existCode = useRef();
+
+  console.log(exist);
 
   //FETCH ALL THE TRADE CODE
 
@@ -37,7 +45,7 @@ function App() {
       .catch((error) => {
         console.log(error);
       });
-  }, [postData, code, update]);
+  }, [postData, code, update, date === ""]);
 
   //ADD NEW STOCK
 
@@ -48,7 +56,7 @@ function App() {
     const modal = document.getElementById("my_modal_4");
 
     const date = target.date.value;
-    const tradeCode = target.tradecode.value;
+    const tradeCode = exist;
     const high = target.high.value;
     const low = target.low.value;
     const open = target.open.value;
@@ -173,14 +181,39 @@ function App() {
 
   //FIND OUT THE VOLUME AVG
 
-  const volumeAvg = stockData
-    .reduce(
+  const shortenNumber = (number) => {
+    if (number >= 1e12) return (number / 1e12).toFixed(1) + "T";
+    if (number >= 1e9) return (number / 1e9).toFixed(1) + "B";
+    if (number >= 1e6) return (number / 1e6).toFixed(1) + "M";
+    if (number >= 1e3) return (number / 1e3).toFixed(1) + "K";
+    return number.toFixed(1);
+  };
+
+  const volumeAvg = shortenNumber(
+    stockData.reduce(
       (total, stock) =>
-        total +
-        parseInt(stock.volume.toString().replace(/,/g, "")) / stockData.length,
+        total + parseInt(stock.volume.toString().replace(/,/g, "")),
       0
-    )
-    .toFixed(2);
+    ) / stockData.length
+  );
+
+  console.log(volumeAvg);
+
+  //SEARCH
+
+  const handleSearch = () => {
+    if (date.length) {
+      const search = stockData.filter((searchData) =>
+        searchData.date.includes(date)
+      );
+      if (search.length > 0) {
+        setStockData(search);
+      } else {
+        setStockData(stockData);
+        toast.error(`NO MATCH BY ${date}`);
+      }
+    }
+  };
 
   return (
     <div className="w-screen h-screen flex flex-col items-center">
@@ -188,7 +221,10 @@ function App() {
 
       <select
         className="select select-bordered mt-10"
-        onChange={(e) => setCode(e.target.value)}
+        onChange={(e) => {
+          setCode(e.target.value);
+          setExist("");
+        }}
       >
         <option selected>SELECT TRADE CODE</option>
         {allTradeCode.map((trade, idx) => (
@@ -237,14 +273,42 @@ function App() {
 
       {/* HERE WE CAN ADD NEW STOCK */}
 
-      <div className="mt-10">
+      <div className="md:flex justify-between items-center mt-16 w-full md:max-w-[1200px]">
         <button
-          className="flex justify-center items-center gap-1"
+          className="flex justify-center items-center gap-1 mt-0 md:mt-16 mx-auto md:mx-0"
           onClick={() => document.getElementById("my_modal_4").showModal()}
         >
           <MdAddCircleOutline className="size-4" />{" "}
           <p className="text-sm">ADD STOCK</p>
         </button>
+
+        <label className="form-control w-full max-w-xs mr-1 mt-4 ml-24 md:ml-0">
+          <div className="label">
+            <span className="label-text">Search by date</span>
+          </div>
+          <div className="md:flex gap-2">
+            <input
+              ref={location}
+              onChange={(e) => setDate(e.currentTarget.value)}
+              type="date"
+              placeholder="YYYY-MM-DD"
+              value={date}
+              className="input input-bordered input-sm w-full sm:max-w-xs"
+            />
+            <button
+              onClick={handleSearch}
+              className="bg-slate-500 w-full sm:w-24 h-8 text-white rounded-md mt-2 md:mt-0"
+            >
+              Search
+            </button>
+            <button
+              className="bg-slate-500 w-full sm:w-20 h-8 text-white rounded-md mt-2 md:mt-0"
+              onClick={() => setDate("")}
+            >
+              Clear
+            </button>
+          </div>
+        </label>
       </div>
 
       {/* TOAST */}
@@ -268,13 +332,32 @@ function App() {
               name="date"
               required
             />
-            <input
-              type="text"
-              placeholder="trade_code"
-              className="input input-bordered input-md w-full "
-              name="tradecode"
-              required
-            />
+
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Create new or select existing trade code"
+                className="input input-bordered input-md w-full "
+                name="tradecode"
+                value={exist}
+                onChange={(e) => setExist(e.currentTarget.value)}
+                required
+              />
+              <details className="dropdown dropdown-end absolute right-3 top-2">
+                <summary className="m-1"></summary>
+                <ul className="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                  <li>
+                    <p
+                      onClick={() => setExist(existCode.current.innerHTML)}
+                      ref={existCode}
+                    >
+                      {stockData?.[0]?.["trade_code"]}
+                    </p>
+                  </li>
+                </ul>
+              </details>
+            </div>
+
             <input
               type="number"
               placeholder="high"
@@ -334,7 +417,7 @@ function App() {
       {code && (
         <div className="w-full h-full px-10 mt-5">
           <div className="overflow-x-auto flex justify-center">
-            <div className="overflow-x-auto max-h-[680px] w-[1200px]">
+            <div className="overflow-x-auto max-h-[1000px] w-[1200px]">
               <table className="table-sm lg:table-lg text-center w-full min-w-max">
                 <thead className="bg-black opacity-70 text-white sticky top-0 z-10">
                   <tr>
