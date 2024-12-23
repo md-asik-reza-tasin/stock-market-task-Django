@@ -29,22 +29,17 @@ function App() {
   //FETCH ALL THE TRADE CODE
 
   useEffect(() => {
-    fetch("https://stock-market-1-29wp.onrender.com/api/trade_codes")
+    fetch("http://127.0.0.1:5000/api/trade_codes")
       .then((res) => res.json())
       .then((data) => {
-        const trimData = data?.trade_codes?.filter(
-          (single) => single.trim() !== ""
-        );
-        setAllTradeCode(trimData);
+        setStockData(data.tradeCode);
       });
   }, [postData]);
 
   //FETCH STOCK DATA ACCORDING TO TRADE CODE
 
   useEffect(() => {
-    fetch(
-      `https://stock-market-1-29wp.onrender.com/api/data?trade_code=${code}`
-    )
+    fetch(`http://127.0.0.1:5000/api/data?trade_code=${code}`)
       .then((res) => res.json())
       .then((data) => {
         setStockData(data);
@@ -94,7 +89,7 @@ function App() {
         volume,
       };
 
-      fetch("https://stock-market-1-29wp.onrender.com/api/data", {
+      fetch("http://127.0.0.1:5000/api/data", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -124,7 +119,7 @@ function App() {
       confirmButtonText: "Yes, delete it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`https://stock-market-1-29wp.onrender.com/api/data/${id}`, {
+        fetch(`http://127.0.0.1:5000/api/data/${id}`, {
           method: "DELETE",
         })
           .then((res) => res.json())
@@ -189,7 +184,7 @@ function App() {
         volume,
       };
 
-      fetch(`https://stock-market-1-29wp.onrender.com/api/data/${id}`, {
+      fetch(`http://127.0.0.1:5000/api/data/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -258,6 +253,8 @@ function App() {
     }
   };
 
+  console.log(stockData);
+
   return (
     <div className="flex flex-col items-center">
       {/* WE CAN CHOOSE TRADE CODE HERE */}
@@ -325,7 +322,7 @@ function App() {
           <p className="text-sm">ADD STOCK</p>
         </button>
 
-        {stockData.length > 0 && (
+        {stockData?.length > 0 && (
           <div className="mt-14">
             <h1 className="font-bold text-xl italic text-center">
               TOTAL STOCK DATA - {stockData.length}
