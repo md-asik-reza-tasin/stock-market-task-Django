@@ -176,7 +176,13 @@ function App() {
   //FIND OUT THE CLOSE AVG
 
   const closeAvg = stockData
-    .reduce((total, stock) => total + stock.close / stockData.length, 0)
+    .reduce(
+      (total, stock) =>
+        isNaN(stock.close)
+          ? total + parseInt(stock.close.toString().replace(/,/g, ""))
+          : total + stock.close / stockData.length,
+      0
+    )
     .toFixed(2);
 
   //FIND OUT THE VOLUME AVG
@@ -189,15 +195,19 @@ function App() {
     return number.toFixed(1);
   };
 
-  const volumeAvg = shortenNumber(
-    stockData.reduce(
-      (total, stock) =>
-        total + parseInt(stock.volume.toString().replace(/,/g, "")),
-      0
-    ) / stockData.length
-  );
+  console.log(stockData);
 
-  console.log(volumeAvg);
+  const volumeAvg =
+    stockData.length > 0
+      ? shortenNumber(
+          stockData.reduce(
+            (total, stock) =>
+              total + parseInt(stock.volume.toString().replace(/,/g, "")),
+
+            0
+          ) / stockData.length
+        )
+      : 0.00;
 
   //SEARCH
 
@@ -216,7 +226,7 @@ function App() {
   };
 
   return (
-    <div className="w-screen h-screen flex flex-col items-center">
+    <div className="flex flex-col items-center">
       {/* WE CAN CHOOSE TRADE CODE HERE */}
 
       <select
@@ -427,8 +437,8 @@ function App() {
       {/* HERE WE CAN SEE THE TABLE OF STOCK DATA */}
 
       {code && (
-        <div className="w-full h-full px-10 mt-5">
-          <div className="overflow-x-auto flex justify-center">
+        <div className="w-full h-full px-10 mt-5 ">
+          <div className="overflow-x-auto flex justify-center mb-10">
             <div className="overflow-x-auto max-h-[1000px] w-[1200px]">
               <table className="table-sm lg:table-lg text-center w-full min-w-max">
                 <thead className="bg-black opacity-70 text-white sticky top-0 z-10">

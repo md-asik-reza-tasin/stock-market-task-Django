@@ -41,7 +41,11 @@ export default function ChartOfStockData({ stockData }) {
       {
         type: "line",
         label: "Close",
-        data: uniqueStockData.map((item) => item.close),
+        data: uniqueStockData.map((item) =>
+          isNaN(item.close)
+            ? parseInt(item.close.toString().replace(/,/g, ""))
+            : item.close
+        ),
         borderColor: "rgb(75, 192, 192)",
         backgroundColor: "rgba(75, 192, 192, 0.2)",
         yAxisID: "y1",
