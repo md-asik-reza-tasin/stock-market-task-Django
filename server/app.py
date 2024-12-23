@@ -14,14 +14,14 @@ Compress(app)
 
 DATABASE = 'stock_data.db'
 
-# frontend_folder = os.path.join(os.getcwd(), "..", "client", "stock-market-client", "dist")
+frontend_folder = os.path.join(os.getcwd(), "..", "client", "stock-market-client", "dist")
 
-# @app.route("/", defaults={"filename": ""})
-# @app.route("/<path:filename>")
-# def index(filename):
-#     if not filename:
-#         filename = "index.html"
-#     return send_from_directory(frontend_folder, filename)
+@app.route("/", defaults={"filename": ""})
+@app.route("/<path:filename>")
+def index(filename):
+    if not filename:
+        filename = "index.html"
+    return send_from_directory(frontend_folder, filename)
 
 
 def get_db():
