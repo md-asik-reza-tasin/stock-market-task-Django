@@ -84,7 +84,7 @@ function App() {
       .then((res) => res.json())
       .then((data) => {
         if (data.message && modal) {
-          toast.success(`Added successfully`);
+          toast.success(`Stock information saved successfully`);
           setPostData(data);
           modal.close();
           target.reset();
@@ -210,7 +210,7 @@ function App() {
         setStockData(search);
       } else {
         setStockData(stockData);
-        toast.error(`NO MATCH BY ${date}`);
+        toast.error("There is no data for this date.");
       }
     }
   };
@@ -273,7 +273,7 @@ function App() {
 
       {/* HERE WE CAN ADD NEW STOCK */}
 
-      <div className="md:flex justify-between items-center mt-16 w-full md:max-w-[1200px]">
+      <div className="md:flex justify-between items-center mt-5 w-full md:max-w-[1200px]">
         <button
           className="btn flex justify-center items-center gap-1 mt-0 md:mt-16 mx-auto md:mx-0"
           onClick={() => document.getElementById("my_modal_4").showModal()}
@@ -281,6 +281,14 @@ function App() {
           <MdAddCircleOutline className="size-4" />{" "}
           <p className="text-sm">ADD STOCK</p>
         </button>
+
+        {stockData.length > 0 && (
+          <div className="mt-14">
+            <h1 className="font-bold text-xl italic text-center">
+              TOTAL STOCK DATA - {stockData.length}
+            </h1>
+          </div>
+        )}
 
         <label className="form-control w-full max-w-xs mr-1 mt-4 ml-24 md:ml-0 pt-6">
           <div className="label">
