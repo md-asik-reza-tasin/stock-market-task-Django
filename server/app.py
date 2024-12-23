@@ -1,9 +1,10 @@
-from flask import Flask, jsonify, request, g
+from flask import Flask, jsonify, request, g, send_from_directory
 from flask_cors import CORS
 from flask_compress import Compress
 import sqlite3
 import json
 import time
+import os
 
 app = Flask(__name__)
 
@@ -12,6 +13,15 @@ CORS(app)
 Compress(app)
 
 DATABASE = 'stock_data.db'
+
+frontend_folder = os.path.join(os.getcwd(), "..", "client", "stock-market-client", "dist")
+
+@app.route("/", defaults={"filename": ""})
+@app.route("/<path:filename>")
+def index(filename):
+    if not filename:
+        filename = "index.html"
+    return send_from_directory(frontend_folder, filename)
 
 
 def get_db():
@@ -174,20 +184,20 @@ def delete_data(id):
 @app.route('/api/data/<int:id>', methods=['PUT'])
 def update_data(id):
     try:
-        # Get the updated stock data from the request body
+        
         stock_data = request.json
         
         conn = get_db()
         cursor = conn.cursor()
 
-        # Check if the record with the given ID exists
+        
         cursor.execute("SELECT * FROM stock_data WHERE id = ?", (id,))
         row = cursor.fetchone()
 
         if row is None:
             return jsonify({"error": "Stock data not found"}), 404
 
-        # Update the stock data with the new values
+        
         cursor.execute('''
         UPDATE stock_data 
         SET date = ?, trade_code = ?, high = ?, low = ?, open = ?, close = ?, volume = ? 
@@ -204,9 +214,9 @@ def update_data(id):
     
 
 if __name__ == '__main__':
-    init_db()  # Initialize the database and create the table
+    init_db() 
 
-    # Insert data only if the table is empty
+    
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM stock_data")
