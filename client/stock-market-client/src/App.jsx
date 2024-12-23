@@ -32,7 +32,7 @@ function App() {
     fetch("http://127.0.0.1:5000/api/trade_codes")
       .then((res) => res.json())
       .then((data) => {
-        setStockData(data.tradeCode);
+        setStockData(data.trade_Code);
       });
   }, [postData]);
 
@@ -253,7 +253,7 @@ function App() {
     }
   };
 
-  console.log(stockData);
+  // console.log(stockData, allTradeCode);
 
   return (
     <div className="flex flex-col items-center">
