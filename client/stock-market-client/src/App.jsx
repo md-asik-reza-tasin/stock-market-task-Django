@@ -131,7 +131,7 @@ function App() {
           .then((data) => {
             if (data.message) {
               toast.success(data.message);
-              const filter = stockData.filter((data) => data.id !== id);
+              const filter = stockData?.filter((data) => data.id !== id);
               setStockData(filter);
             }
           })
@@ -145,7 +145,7 @@ function App() {
   //FOR SHOWING THE MODAL (SPECIFIC STOCK DATA ACCORDING TO ID)
 
   const handleEdit = (id) => {
-    const editData = stockData.filter((single) => single.id === id);
+    const editData = stockData?.filter((single) => single.id === id);
     setcurrentData(editData);
   };
 
@@ -246,7 +246,7 @@ function App() {
 
   const handleSearch = () => {
     if (date.length) {
-      const search = stockData.filter((searchData) =>
+      const search = stockData?.filter((searchData) =>
         searchData.date.includes(date)
       );
       if (search.length > 0) {
@@ -270,7 +270,7 @@ function App() {
         }}
       >
         <option selected>SELECT TRADE CODE</option>
-        {allTradeCode.map((trade, idx) => (
+        {allTradeCode?.map((trade, idx) => (
           <option key={idx}>{trade}</option>
         ))}
       </select>
