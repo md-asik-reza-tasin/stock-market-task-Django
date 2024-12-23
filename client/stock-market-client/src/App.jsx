@@ -24,14 +24,16 @@ function App() {
   const location = useRef();
   const existCode = useRef();
 
-  console.log(exist);
+  // console.log(code);
 
   //FETCH ALL THE TRADE CODE
 
   useEffect(() => {
     fetch("http://127.0.0.1:5000/api/trade_codes")
       .then((res) => res.json())
-      .then((data) => setAllTradeCode(data.trade_codes));
+      .then((data) => {
+        setAllTradeCode(data.trade_codes);
+      });
   }, [postData]);
 
   //FETCH STOCK DATA ACCORDING TO TRADE CODE
@@ -52,6 +54,8 @@ function App() {
   const handleNewStockData = (e) => {
     e.preventDefault();
 
+    setErrorMessage("");
+
     const target = e.target;
     const modal = document.getElementById("my_modal_4");
 
@@ -63,33 +67,45 @@ function App() {
     const close = target.close.value;
     const volume = target.volume.value;
 
-    const newStock = {
-      date,
-      tradeCode,
-      high,
-      low,
-      low,
-      open,
-      close,
-      volume,
-    };
+    if (volume.toString().length > 9) {
+      return setErrorMessage("Volume is too big, It should not exceed 9 digit");
+    } else if (high.toString().length > 5) {
+      return setErrorMessage("high is too big, It should not exceed 5 digit");
+    } else if (low.toString().length > 5) {
+      return setErrorMessage("low is too big, It should not exceed 5 digit");
+    } else if (close.toString().length > 9) {
+      return setErrorMessage("close is too big, It should not exceed 9 digit");
+    } else if (open.toString().length > 5) {
+      return setErrorMessage("open is too big, It should not exceed 5 digit");
+    } else {
+      const newStock = {
+        date,
+        tradeCode,
+        high,
+        low,
+        low,
+        open,
+        close,
+        volume,
+      };
 
-    fetch("http://127.0.0.1:5000/api/data", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newStock),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.message && modal) {
-          toast.success(`Stock information saved successfully`);
-          setPostData(data);
-          modal.close();
-          target.reset();
-        }
-      });
+      fetch("http://127.0.0.1:5000/api/data", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newStock),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.message && modal) {
+            toast.success(`Stock information saved successfully`);
+            setPostData(data);
+            modal.close();
+            target.reset();
+          }
+        });
+    }
   };
 
   //DELETE SPECIFIC STOCK DATA
@@ -110,7 +126,7 @@ function App() {
           .then((data) => {
             if (data.message) {
               toast.success(data.message);
-              const filter = stockData.filter((data) => data.id !== id);
+              const filter = stockData?.filter((data) => data.id !== id);
               setStockData(filter);
             }
           })
@@ -124,7 +140,7 @@ function App() {
   //FOR SHOWING THE MODAL (SPECIFIC STOCK DATA ACCORDING TO ID)
 
   const handleEdit = (id) => {
-    const editData = stockData.filter((single) => single.id === id);
+    const editData = stockData?.filter((single) => single.id === id);
     setcurrentData(editData);
   };
 
@@ -157,7 +173,6 @@ function App() {
     } else if (open.toString().length > 6) {
       return setErrorMessage("open is too big, It should not exceed 6 digit");
     } else {
-      
       const newStock = {
         date,
         tradeCode,
@@ -189,13 +204,13 @@ function App() {
   };
 
   //FIND OUT THE CLOSE AVG
-
+  console.log(stockData);
   const closeAvg = stockData
-    .reduce(
+    ?.reduce(
       (total, stock) =>
         isNaN(stock.close)
-          ? total + parseInt(stock.close.toString().replace(/,/g, ""))
-          : total + stock.close / stockData.length,
+          ? total + parseInt(stock?.close?.toString()?.replace(/,/g, ""))
+          : total + stock.close / stockData?.length,
       0
     )
     .toFixed(2);
@@ -210,17 +225,15 @@ function App() {
     return number.toFixed(1);
   };
 
-  console.log(stockData);
-
   const volumeAvg =
-    stockData.length > 0
+    stockData?.length > 0
       ? shortenNumber(
-          stockData.reduce(
+          stockData?.reduce(
             (total, stock) =>
-              total + parseInt(stock.volume.toString().replace(/,/g, "")),
+              total + parseInt(stock?.volume?.toString()?.replace(/,/g, "")),
 
             0
-          ) / stockData.length
+          ) / stockData?.length
         )
       : 0;
 
@@ -228,7 +241,7 @@ function App() {
 
   const handleSearch = () => {
     if (date.length) {
-      const search = stockData.filter((searchData) =>
+      const search = stockData?.filter((searchData) =>
         searchData.date.includes(date)
       );
       if (search.length > 0) {
@@ -239,6 +252,8 @@ function App() {
       }
     }
   };
+
+  console.log(stockData, allTradeCode);
 
   return (
     <div className="flex flex-col items-center">
@@ -252,7 +267,7 @@ function App() {
         }}
       >
         <option selected>SELECT TRADE CODE</option>
-        {allTradeCode.map((trade, idx) => (
+        {allTradeCode?.map((trade, idx) => (
           <option key={idx}>{trade}</option>
         ))}
       </select>
@@ -298,7 +313,7 @@ function App() {
 
       {/* HERE WE CAN ADD NEW STOCK */}
 
-      <div className="md:flex justify-between items-center mt-5 w-full md:max-w-[1200px]">
+      <div className="md:flex justify-between items-center mx-auto mt-5 w-full md:max-w-[1200px]">
         <button
           className="btn flex justify-center items-center gap-1 mt-0 md:mt-16 mx-auto md:mx-0"
           onClick={() => document.getElementById("my_modal_4").showModal()}
@@ -307,7 +322,7 @@ function App() {
           <p className="text-sm">ADD STOCK</p>
         </button>
 
-        {stockData.length > 0 && (
+        {stockData?.length > 0 && (
           <div className="mt-14">
             <h1 className="font-bold text-xl italic text-center">
               TOTAL STOCK DATA - {stockData.length}
@@ -315,11 +330,11 @@ function App() {
           </div>
         )}
 
-        <label className="form-control w-full max-w-xs mr-1 mt-4 ml-24 md:ml-0 pt-6">
+        <label className="form-control mt-4 md:ml-0 pt-6 mx-10">
           <div className="label">
             <span className="label-text">Search by date</span>
           </div>
-          <div className="md:flex gap-2">
+          <div className="md:flex gap-2 ">
             <input
               ref={location}
               onChange={(e) => setDate(e.currentTarget.value)}
@@ -356,7 +371,7 @@ function App() {
         <div className="modal-box p-16 w-11/12 max-w-5xl rounded-sm">
           <form
             onSubmit={handleNewStockData}
-            className="grid grid-cols-2 gap-5"
+            className="flex flex-col  md:grid  md:grid-cols-2 gap-5"
           >
             <input
               type="date"
@@ -369,7 +384,7 @@ function App() {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Create new                Or"
+                placeholder="Create new or select"
                 className="input input-bordered input-md w-full "
                 name="tradecode"
                 value={exist}
@@ -378,7 +393,7 @@ function App() {
               />
               {exist.length === 0 && (
                 <details className="dropdown dropdown-end absolute right-3 top-2">
-                  <summary className="m-1">select existing trade code</summary>
+                  <summary className="m-1"></summary>
                   <ul className="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
                     <li>
                       <p
@@ -440,6 +455,9 @@ function App() {
               value="Submit"
               className="bg-black opacity-80 w-full col-span-2 text-white h-12 rounded-md"
             />
+            <p className="text-red-600 text-center col-span-2">
+              {errorMessage.length > 0 && errorMessage}
+            </p>
           </form>
           <div className="modal-action">
             <form method="dialog">
@@ -480,7 +498,7 @@ function App() {
                       <td>{codeInfo.low}</td>
                       <td>{codeInfo.open}</td>
                       <td>{codeInfo.close}</td>
-                      <td>{codeInfo.volume.toLocaleString()}</td>
+                      <td>{codeInfo?.volume?.toLocaleString()}</td>
 
                       {/* WE CAN DELETE SPECIFIC DATA */}
                       <td className="flex justify-center items-center gap-5">
@@ -519,7 +537,7 @@ function App() {
                   <form
                     key={idx}
                     onSubmit={(e) => handlecurrentData(e, currentRow.id)}
-                    className="grid grid-cols-2 gap-5"
+                    className="flex flex-col md:grid md:grid-cols-2 gap-5"
                   >
                     <label>
                       <span className="mb-1">Date</span>
