@@ -29,21 +29,21 @@ ChartJS.register(
 );
 
 export default function ChartOfStockData({ stockData }) {
-  const uniqueStockData = stockData.filter(
+  const uniqueStockData = stockData?.filter(
     (item, index, self) => index === self.findIndex((t) => t.date === item.date)
   );
 
-  uniqueStockData.sort((a, b) => new Date(a.date) - new Date(b.date));
+  uniqueStockData?.sort((a, b) => new Date(a.date) - new Date(b.date));
 
   const chartData = {
-    labels: uniqueStockData.map((item) => item.date),
+    labels: uniqueStockData?.map((item) => item.date),
     datasets: [
       {
         type: "line",
         label: "Close",
-        data: uniqueStockData.map((item) =>
+        data: uniqueStockData?.map((item) =>
           isNaN(item.close)
-            ? parseInt(item.close.toString().replace(/,/g, ""))
+            ? parseInt(item?.close?.toString().replace(/,/g, ""))
             : item.close
         ),
         borderColor: "rgb(75, 192, 192)",
@@ -53,8 +53,8 @@ export default function ChartOfStockData({ stockData }) {
       {
         type: "bar",
         label: "Volume",
-        data: uniqueStockData.map((item) =>
-          parseInt(item.volume.toString().replace(/,/g, ""))
+        data: uniqueStockData?.map((item) =>
+          parseInt(item?.volume?.toString().replace(/,/g, ""))
         ),
         backgroundColor: "rgba(153, 102, 255, 0.2)",
         borderColor: "rgb(153, 102, 255)",
