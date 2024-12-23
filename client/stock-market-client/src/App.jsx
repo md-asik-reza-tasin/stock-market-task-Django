@@ -24,12 +24,12 @@ function App() {
   const location = useRef();
   const existCode = useRef();
 
-  console.log(code);
+  // console.log(code);
 
   //FETCH ALL THE TRADE CODE
 
   useEffect(() => {
-    fetch("https://stock-market-1-29wp.onrender.com/api/trade_codes")
+    fetch("http://127.0.0.1:5000/api/trade_codes")
       .then((res) => res.json())
       .then((data) => {
         const trimData = data?.trade_codes?.filter(
@@ -42,9 +42,7 @@ function App() {
   //FETCH STOCK DATA ACCORDING TO TRADE CODE
 
   useEffect(() => {
-    fetch(
-      `https://stock-market-1-29wp.onrender.com/api/data?trade_code=${code}`
-    )
+    fetch(`http://127.0.0.1:5000/api/data?trade_code=${code}`)
       .then((res) => res.json())
       .then((data) => {
         setStockData(data);
@@ -94,7 +92,7 @@ function App() {
         volume,
       };
 
-      fetch("https://stock-market-1-29wp.onrender.com/api/data", {
+      fetch("http://127.0.0.1:5000/api/data", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -124,7 +122,7 @@ function App() {
       confirmButtonText: "Yes, delete it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`https://stock-market-1-29wp.onrender.com/api/data/${id}`, {
+        fetch(`http://127.0.0.1:5000/api/data/${id}`, {
           method: "DELETE",
         })
           .then((res) => res.json())
@@ -189,7 +187,7 @@ function App() {
         volume,
       };
 
-      fetch(`https://stock-market-1-29wp.onrender.com/api/data/${id}`, {
+      fetch(`http://127.0.0.1:5000/api/data/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -209,7 +207,7 @@ function App() {
   };
 
   //FIND OUT THE CLOSE AVG
-
+  console.log(stockData);
   const closeAvg = stockData
     ?.reduce(
       (total, stock) =>
