@@ -29,7 +29,7 @@ function App() {
   //FETCH ALL THE TRADE CODE
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/api/trade_codes")
+    fetch("https://stock-market-1-29wp.onrender.com/api/trade_codes")
       .then((res) => res.json())
       .then((data) => {
         setAllTradeCode(data.trade_codes);
@@ -39,7 +39,7 @@ function App() {
   //FETCH STOCK DATA ACCORDING TO TRADE CODE
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:5000/api/data?trade_code=${code}`)
+    fetch(`https://stock-market-1-29wp.onrender.com/api/data?trade_code=${code}`)
       .then((res) => res.json())
       .then((data) => {
         setStockData(data);
@@ -89,7 +89,7 @@ function App() {
         volume,
       };
 
-      fetch("http://127.0.0.1:5000/api/data", {
+      fetch("https://stock-market-1-29wp.onrender.com/api/data", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -119,7 +119,7 @@ function App() {
       confirmButtonText: "Yes, delete it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`http://127.0.0.1:5000/api/data/${id}`, {
+        fetch(`https://stock-market-1-29wp.onrender.com/api/data/${id}`, {
           method: "DELETE",
         })
           .then((res) => res.json())
@@ -184,7 +184,7 @@ function App() {
         volume,
       };
 
-      fetch(`http://127.0.0.1:5000/api/data/${id}`, {
+      fetch(`https://stock-market-1-29wp.onrender.com/api/data/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
