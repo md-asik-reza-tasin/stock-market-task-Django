@@ -311,10 +311,6 @@ function App() {
         </div>
       </div>
 
-      <div>
-        <h1>Hello</h1>
-      </div>
-
       {/* HERE WE CAN ADD NEW STOCK */}
 
       <div>
