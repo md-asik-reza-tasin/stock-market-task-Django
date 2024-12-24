@@ -317,6 +317,10 @@ function App() {
 
       {/* HERE WE CAN ADD NEW STOCK */}
 
+      <div>
+        <h1>Hello</h1>
+      </div>
+
       <div className="md:flex justify-between items-center mx-auto mt-5 w-full md:max-w-[1200px]">
         <button
           className="btn flex justify-center items-center gap-1 mt-0 md:mt-16 mx-auto md:mx-0"
