@@ -311,6 +311,10 @@ function App() {
         </div>
       </div>
 
+      <div>
+        <h1>Hello</h1>
+      </div>
+
       {/* HERE WE CAN ADD NEW STOCK */}
 
       <div className="md:flex justify-between items-center mx-auto mt-5 w-full md:max-w-[1200px]">
