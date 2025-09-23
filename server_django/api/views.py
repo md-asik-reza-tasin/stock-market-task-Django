@@ -97,3 +97,5 @@ def delete_stock(request, id):
         return Response({"message": "Data deleted successfully"})
     except StockData.DoesNotExist:
         return Response({"error": "Stock data not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
