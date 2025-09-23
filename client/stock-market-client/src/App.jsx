@@ -11,6 +11,7 @@ import Swal from "sweetalert2";
 import ChartOfStockData from "./ChartOfStockData";
 import { API_BASE_URL } from "./base_url";
 import DropDown from "./reusable/DropDown";
+import InfoCard from "./reusable/InfoCard";
 
 function App() {
   const [stockData, setStockData] = useState([]);
@@ -284,30 +285,24 @@ function App() {
         {/* TRADE CODE , CLOSE AVG, VOLUME AVG */}
 
         <div className="grid grid-cols-1 mt-12 gap-5">
-          <div className="md:w-56 h-32 bg-red-100 shadow-xl">
-            <h1 className="font-bold text-gray-400 text-sm ml-6 mt-5">
-              Trade Code
-            </h1>
-            <p className="font-extrabold text-2xl ml-6 mt-3">
-              {code === "SELECT TRADE CODE" ? "----" : code}
-            </p>
-          </div>
-          <div className="md:w-56 h-32 bg-orange-100 shadow-xl">
-            <h1 className="font-bold text-gray-400 text-sm ml-6 mt-5">
-              Close Average
-            </h1>
-            <p className="font-extrabold text-2xl ml-6 mt-3">
-              {code === "SELECT TRADE CODE" ? "----" : closeAvg}
-            </p>
-          </div>
-          <div className="md:w-56 h-32 bg-yellow-100 shadow-xl">
-            <h1 className="font-bold text-gray-400 text-sm ml-6 mt-5">
-              Volume Average
-            </h1>
-            <p className="font-extrabold text-2xl ml-6 mt-3">
-              {code === "SELECT TRADE CODE" ? "----" : volumeAvg}
-            </p>
-          </div>
+          <InfoCard
+            name={"Trade Code"}
+            code={code}
+            value={code}
+            color={`bg-red-100`}
+          />
+          <InfoCard
+            name={"Close Average"}
+            code={code}
+            value={closeAvg}
+            color={`bg-orange-100`}
+          />
+          <InfoCard
+            name={"Volume Average"}
+            code={code}
+            value={volumeAvg}
+            color={`bg-yellow-100`}
+          />
         </div>
       </div>
 
