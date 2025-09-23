@@ -10,6 +10,7 @@ import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
 import ChartOfStockData from "./ChartOfStockData";
 import { API_BASE_URL } from "./base_url";
+import DropDown from "./reusable/DropDown";
 
 function App() {
   const [stockData, setStockData] = useState([]);
@@ -262,18 +263,14 @@ function App() {
     <div className="flex flex-col items-center">
       {/* WE CAN CHOOSE TRADE CODE HERE */}
 
-      <select
+      <DropDown
         className="select select-bordered mt-10"
         onChange={(e) => {
           setCode(e.target.value);
           setExist("");
         }}
-      >
-        <option selected>SELECT TRADE CODE</option>
-        {allTradeCode?.map((trade, idx) => (
-          <option key={idx}>{trade}</option>
-        ))}
-      </select>
+        value={allTradeCode}
+      />
 
       {/* SHOWING THE CHART */}
 
