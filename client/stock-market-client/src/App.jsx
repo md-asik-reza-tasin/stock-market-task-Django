@@ -448,7 +448,7 @@ function App() {
             <input
               type="submit"
               value="Submit"
-              className="bg-black opacity-80 w-full col-span-2 text-white h-12 rounded-md"
+              className="bg-black opacity-80 w-full col-span-2 text-white h-12 rounded-md cursor-pointer"
             />
             <p className="text-red-600 text-center col-span-2">
               {errorMessage.length > 0 && errorMessage}
