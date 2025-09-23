@@ -9,6 +9,7 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
 import ChartOfStockData from "./ChartOfStockData";
+import { API_BASE_URL } from "./base_url";
 
 function App() {
   const [stockData, setStockData] = useState([]);
@@ -20,6 +21,7 @@ function App() {
   const [date, setDate] = useState("");
   const [exist, setExist] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [deleteMessage, setDeleteMessage] = useState("");
 
   const location = useRef();
   const existCode = useRef();
@@ -29,17 +31,17 @@ function App() {
   //FETCH ALL THE TRADE CODE
 
   useEffect(() => {
-    fetch("https://stock-market-1-29wp.onrender.com/api/trade_codes")
+    fetch(`${API_BASE_URL}/trade_codes`)
       .then((res) => res.json())
       .then((data) => {
         setAllTradeCode(data.trade_codes);
       });
-  }, [postData]);
+  }, [postData, deleteMessage]);
 
   //FETCH STOCK DATA ACCORDING TO TRADE CODE
 
   useEffect(() => {
-    fetch(`https://stock-market-1-29wp.onrender.com/api/data?trade_code=${code}`)
+    fetch(`${API_BASE_URL}/data?trade_code=${code}`)
       .then((res) => res.json())
       .then((data) => {
         setStockData(data);
@@ -47,7 +49,7 @@ function App() {
       .catch((error) => {
         console.log(error);
       });
-  }, [postData, code, update, date === ""]);
+  }, [postData, code, update, date === "", deleteMessage]);
 
   //ADD NEW STOCK
 
@@ -80,7 +82,7 @@ function App() {
     } else {
       const newStock = {
         date,
-        tradeCode,
+        trade_code: tradeCode,
         high,
         low,
         low,
@@ -89,7 +91,7 @@ function App() {
         volume,
       };
 
-      fetch("https://stock-market-1-29wp.onrender.com/api/data", {
+      fetch(`${API_BASE_URL}/data/add/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -119,7 +121,7 @@ function App() {
       confirmButtonText: "Yes, delete it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`https://stock-market-1-29wp.onrender.com/api/data/${id}`, {
+        fetch(`${API_BASE_URL}/data/${id}/delete/`, {
           method: "DELETE",
         })
           .then((res) => res.json())
@@ -128,6 +130,7 @@ function App() {
               toast.success(data.message);
               const filter = stockData?.filter((data) => data.id !== id);
               setStockData(filter);
+              setDeleteMessage(data?.message);
             }
           })
           .catch((error) => {
@@ -175,7 +178,7 @@ function App() {
     } else {
       const newStock = {
         date,
-        tradeCode,
+        trade_code: tradeCode,
         high,
         low,
         low,
@@ -184,7 +187,7 @@ function App() {
         volume,
       };
 
-      fetch(`https://stock-market-1-29wp.onrender.com/api/data/${id}`, {
+      fetch(`${API_BASE_URL}/data/${id}/update/`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -312,8 +315,6 @@ function App() {
       </div>
 
       {/* HERE WE CAN ADD NEW STOCK */}
-
-  
 
       <div className="md:flex justify-between items-center mx-auto mt-5 w-full md:max-w-[1200px]">
         <button
