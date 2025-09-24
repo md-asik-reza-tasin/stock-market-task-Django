@@ -24,9 +24,17 @@ Check out the live frontend here: [Live Demo](https://silver-naiad-1baf3d.netlif
 - Docker and Docker Compose installed
 - Node.js and npm installed (for frontend development if needed)
 
-### Clone the Repository
-```bash
-git clone https://github.com/md-asik-reza-tasin/stock-market-task-Django.git
+### Run the Project in Docker
 
-# Build and run the app with Docker
+If you want to run the project locally using Docker, follow these steps:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/md-asik-reza-tasin/stock-market-task-Django.git
+cd stock-market-task-Django
+
+# 2. Build and run the app with Docker
 docker-compose up --build
+
+
+
