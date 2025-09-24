@@ -2,6 +2,10 @@
 
 A full-stack web application built with **Django** for the backend and **React.js** for the frontend. The app allows users to view, add, update, and delete stock data. It uses **SQLite** for data storage and is hosted with **Docker** for easy deployment.
 
+## Live Demo
+
+Check out the live frontend here: [Live Demo](https://silver-naiad-1baf3d.netlify.app/)
+
 ## Features
 - **View Data**: Select a trade code to see relevant stock data.  
 - **Add New Data**: Create a new stock entry or update an existing one.  
