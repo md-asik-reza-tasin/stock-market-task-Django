@@ -20,4 +20,6 @@ A full-stack web application built with **Django** for the backend and **React.j
 - Docker and Docker Compose installed
 - Node.js and npm installed (for frontend development if needed)
 
-
+### Clone the Repository
+```bash
+git clone https://github.com/md-asik-reza-tasin/stock-market-task-Django.git
