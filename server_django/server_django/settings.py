@@ -28,13 +28,7 @@ DEBUG = True
 
 
 
-ALLOWED_HOSTS = [
-    "stock-market-backend-yo0t.onrender.com",
-    "www.stock-market-backend-yo0t.onrender.com",
-    ".onrender.com",  # Allows any subdomain of onrender.com
-    "localhost",
-    "127.0.0.1",
-]
+ALLOWED_HOSTS = ["https://stock-market-backend-1.onrender.com"]
 
 
 # Application definition
