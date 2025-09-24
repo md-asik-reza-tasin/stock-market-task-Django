@@ -28,7 +28,7 @@ DEBUG = True
 
 
 
-ALLOWED_HOSTS = ["https://stock-market-backend-1.onrender.com"]
+ALLOWED_HOSTS = ["stock-market-backend-1.onrender.com"]
 
 
 # Application definition
