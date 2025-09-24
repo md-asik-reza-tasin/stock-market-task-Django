@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  backend:
+    build: ./server_django
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: ./client/stock-market-client
+    ports:
+      - "5173:5173"
